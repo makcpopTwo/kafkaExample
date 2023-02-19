@@ -12,3 +12,19 @@ Configure kafka with the following commands
 # Service
 
 Control turning on/off of consumers with properties.
+
+# Reproducing steps
+- run kafka and configure accotding to the steps before
+- build service
+- run the first service with the following configuration
+```
+turnOnFirstConsumer=false
+turnOnSecondConsumer=true
+```
+- run the second service with the following configuration
+```
+turnOnFirstConsumer=true
+turnOnSecondConsumer=false
+```
+- wait for UnathorizedException in the second service (about 1 minute)
+- check logs in the first service
