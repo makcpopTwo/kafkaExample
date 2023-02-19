@@ -1,0 +1,40 @@
+version: "2"
+
+services:
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:3.8
+    ports:
+      - "2181:2181"
+      - "8080:8080"
+    volumes:
+      - "zookeeper_data:/bitnami"
+      - ./security:/opt/security
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: docker.io/bitnami/kafka:3.3
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+      - ./security:/opt/security
+      - ./config/kafka/log4j.properties.template:/etc/confluent/docker/log4j.properties.template
+      - ./logs:/var/log/kafka/
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_AUTHORIZER_CLASS_NAME=kafka.security.authorizer.AclAuthorizer
+      - KAFKA_CFG_ALLOW_EVERYONE_IF_NO_ACL_FOUND=true
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - JMX_EXPORTER_ENABLE=yes
+      - JMX_EXPORTER_PORT=9999
+    depends_on:
+      - zookeeper
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
